@@ -1,0 +1,25 @@
+{
+  "name": "shop-iceberg-sink",
+  "config": {
+    "connector.class": "org.apache.iceberg.connect.IcebergSinkConnector",
+    "tasks.max": "2",
+    "topics": "shop.shop.customers,shop.shop.products,shop.shop.orders,shop.shop.order_items",
+    "iceberg.tables": "bronze.customers,bronze.products,bronze.orders,bronze.order_items",
+    "iceberg.tables.route-field": "_topic",
+    "iceberg.tables.auto-create-enabled": "true",
+    "iceberg.tables.evolve-schema-enabled": "true",
+    "iceberg.catalog.type": "nessie",
+    "iceberg.catalog.uri": "http://nessie:19120/api/v2",
+    "iceberg.catalog.ref": "main",
+    "iceberg.catalog.warehouse": "s3://warehouse/",
+    "iceberg.catalog.s3.endpoint": "http://minio:9000",
+    "iceberg.catalog.client.region": "us-east-1",
+    "iceberg.catalog.s3.path-style-access": "true",
+    "iceberg.catalog.s3.access-key-id": "minioadmin",
+    "iceberg.catalog.s3.secret-access-key": "minioadmin",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "true",
+    "value.converter.schemas.enable": "true"
+  }
+}

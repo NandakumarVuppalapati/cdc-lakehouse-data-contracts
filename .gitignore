@@ -1,0 +1,16 @@
+.env
+*.pyc
+__pycache__/
+.venv/
+venv/
+dbt_packages/
+target/
+logs/
+.DS_Store
+*.log
+great_expectations/uncommitted/
+.terraform/
+*.tfstate
+*.tfstate.backup
+.idea/
+.vscode/

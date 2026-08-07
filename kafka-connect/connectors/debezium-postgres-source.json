@@ -1,0 +1,27 @@
+{
+  "name": "shop-postgres-source",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "lakehouse",
+    "database.password": "lakehouse",
+    "database.dbname": "sourcedb",
+    "topic.prefix": "shop",
+    "schema.include.list": "shop",
+    "table.include.list": "shop.customers,shop.products,shop.orders,shop.order_items",
+    "plugin.name": "pgoutput",
+    "publication.name": "lakehouse_pub",
+    "publication.autocreate.mode": "disabled",
+    "slot.name": "lakehouse_debezium_slot",
+    "snapshot.mode": "initial",
+    "tombstones.on.delete": "false",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "true",
+    "value.converter.schemas.enable": "true",
+    "topic.creation.enable": "true",
+    "topic.creation.default.partitions": "1",
+    "topic.creation.default.replication.factor": "1"
+  }
+}
