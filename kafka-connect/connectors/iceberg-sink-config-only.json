@@ -1,0 +1,4 @@
+{
+  "_deprecated": true,
+  "_reason": "Superseded — see iceberg-sink.json in this same folder for why. Not deleted only because this Windows-synced folder doesn't allow file deletion from the sandbox; this file is inert and unused by scripts/register-connectors.sh."
+}
