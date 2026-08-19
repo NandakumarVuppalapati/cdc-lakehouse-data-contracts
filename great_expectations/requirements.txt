@@ -1,0 +1,7 @@
+# Versions confirmed against PyPI/docs.greatexpectations.io directly before
+# pinning (not guessed) — see ADR 0020.
+great_expectations==1.20.0
+trino[sqlalchemy]==0.338.0
+# Pushes checkpoint pass/fail + duration to Pushgateway after each run.
+# See ADR 0024. Version confirmed against PyPI before pinning.
+prometheus-client==0.25.0
