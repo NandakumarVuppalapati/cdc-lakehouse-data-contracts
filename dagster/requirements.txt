@@ -1,0 +1,13 @@
+# Versions confirmed against PyPI/docs.dagster.io directly before pinning —
+# see ADR 0022. dagster and dagster-dbt are released in lockstep (same date,
+# different version numbers — 1.13.18 / 0.29.18 — this is normal for this
+# project, not a mismatch).
+dagster==1.13.18
+dagster-webserver==1.13.18
+dagster-dbt==0.29.18
+dbt-trino==1.10.2
+great_expectations==1.20.0
+trino[sqlalchemy]==0.338.0
+# Pushes dbt-build and GX-check metrics to Pushgateway, same as the
+# standalone dbt/great-expectations images. See ADR 0024.
+prometheus-client==0.25.0
