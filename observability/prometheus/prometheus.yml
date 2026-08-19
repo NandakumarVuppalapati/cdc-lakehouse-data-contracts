@@ -1,0 +1,35 @@
+# Prometheus scrape config. Two real scrape targets:
+#
+# - kafka-exporter: long-running process, polls the Kafka broker directly
+#   (AdminClient calls, not JMX) and exposes consumer-group lag as a normal
+#   /metrics endpoint — a natural pull target.
+# - pushgateway: batch jobs (dbt build, the GX checkpoint) are short-lived
+#   containers that exit before Prometheus could ever scrape them directly,
+#   so they push their own metrics to Pushgateway after each run, and
+#   Prometheus scrapes Pushgateway itself (the textbook pattern Prometheus's
+#   own docs recommend for exactly this "batch job" shape — see ADR 0024).
+#
+# Prometheus's own /metrics (self-monitoring) is included too, mostly so
+# the Grafana "Prometheus" datasource has at least one guaranteed-present
+# series to sanity-check connectivity against.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: kafka-exporter
+    static_configs:
+      - targets: ["kafka-exporter:9308"]
+
+  # honor_labels: true so metrics keep the `job` label the pusher set
+  # (dbt_build, great_expectations) instead of Prometheus overwriting it
+  # with `pushgateway` — otherwise every batch job's series would collapse
+  # into one indistinguishable "pushgateway" job in Grafana.
+  - job_name: pushgateway
+    honor_labels: true
+    static_configs:
+      - targets: ["pushgateway:9091"]

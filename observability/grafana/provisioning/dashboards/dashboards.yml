@@ -1,0 +1,15 @@
+# Points Grafana at ./dashboards for auto-loaded dashboard JSON — same
+# no-manual-clicking provisioning approach as the datasource. Any *.json
+# file dropped into the mounted dashboards/ folder shows up after a
+# refresh (updateIntervalSeconds below), no import step required.
+apiVersion: 1
+
+providers:
+  - name: lakehouse
+    orgId: 1
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/files

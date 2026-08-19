@@ -1,0 +1,124 @@
+{
+  "title": "CDC Lakehouse — Pipeline Health",
+  "uid": "cdc-lakehouse-overview",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "timezone": "browser",
+  "time": { "from": "now-1h", "to": "now" },
+  "refresh": "15s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Iceberg sink consumer lag (events behind Kafka)",
+      "description": "kafka_consumergroup_lag_sum for each shop-iceberg-sink-* connector's consumer group (Kafka Connect's default naming: connect-<connector-name>). Non-zero and climbing means the sink is falling behind the CDC event stream.",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "custom": { "drawStyle": "line", "fillOpacity": 10 } },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "kafka_consumergroup_lag_sum{consumergroup=~\"connect-shop-iceberg-sink.*\"}",
+          "legendFormat": "{{consumergroup}} / {{topic}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "dbt build duration",
+      "description": "Wall-clock time of each `dbt build` invocation, pushed to Pushgateway by dbt/run_with_metrics.py after every run (standalone `docker compose run --rm dbt build` and Dagster's dbt asset both push here — job label distinguishes them).",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "s", "custom": { "drawStyle": "line", "fillOpacity": 10 } },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "dbt_build_duration_seconds",
+          "legendFormat": "{{job}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Last dbt build result",
+      "description": "1 = last `dbt build` succeeded, 0 = failed (Model Contract violation, connection error, etc).",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "FAILED", "color": "red" }, "1": { "text": "PASSED", "color": "green" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "targets": [
+        { "datasource": "Prometheus", "expr": "dbt_build_success", "legendFormat": "{{job}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "dbt test failures (contract layer 2 + data tests)",
+      "description": "Count of dbt data_tests (not_null/unique/etc, including the ones dagster-dbt surfaces as asset checks) with status != pass, parsed from target/run_results.json by dbt/run_with_metrics.py. Does not double-count a Model Contract violation, since that already fails the whole `dbt build` and shows up in the panel above.",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "targets": [
+        { "datasource": "Prometheus", "expr": "dbt_test_failures", "legendFormat": "{{job}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Last Great Expectations checkpoint result",
+      "description": "Contract layer 3 (row-level quality, gold_order_summary). 1 = passed, 0 = failed — e.g. the 'shpped' typo demo (docs/assets/08-great-expectations-failure.jpg).",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "FAILED", "color": "red" }, "1": { "text": "PASSED", "color": "green" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        },
+        "overrides": []
+      },
+      "targets": [
+        { "datasource": "Prometheus", "expr": "gx_checkpoint_success", "legendFormat": "{{job}}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "GX checkpoint duration",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "s", "custom": { "drawStyle": "line", "fillOpacity": 10 } },
+        "overrides": []
+      },
+      "targets": [
+        { "datasource": "Prometheus", "expr": "gx_checkpoint_duration_seconds", "legendFormat": "{{job}}", "refId": "A" }
+      ]
+    }
+  ]
+}
