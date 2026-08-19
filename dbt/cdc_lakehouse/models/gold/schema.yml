@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: gold_order_summary
+    description: >
+      One row per order: who placed it, its status, how many line items,
+      and the total amount. Model Contract enforced — dbt validates these
+      exact column names and types against the model's actual output before
+      building it.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: order_id
+        data_type: integer
+        data_tests: [not_null, unique]
+      - name: customer_id
+        data_type: integer
+        data_tests: [not_null]
+      - name: customer_name
+        data_type: varchar
+      - name: customer_email
+        data_type: varchar
+      - name: status
+        data_type: varchar
+      - name: placed_at
+        data_type: timestamp(3) with time zone
+      - name: item_count
+        data_type: bigint
+      - name: total_amount_cents
+        data_type: bigint

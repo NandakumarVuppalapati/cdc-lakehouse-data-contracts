@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: silver_customers
+    description: One row per customer, current state only (deletes dropped).
+    columns:
+      - name: customer_id
+        data_tests: [not_null, unique]
+      - name: email
+        data_tests: [not_null]
+
+  - name: silver_products
+    description: One row per product, current state only.
+    columns:
+      - name: product_id
+        data_tests: [not_null, unique]
+
+  - name: silver_orders
+    description: One row per order, current state only.
+    columns:
+      - name: order_id
+        data_tests: [not_null, unique]
+      - name: customer_id
+        data_tests: [not_null]
+
+  - name: silver_order_items
+    description: One row per order line item, current state only.
+    columns:
+      - name: order_item_id
+        data_tests: [not_null, unique]
+      - name: order_id
+        data_tests: [not_null]
+      - name: product_id
+        data_tests: [not_null]

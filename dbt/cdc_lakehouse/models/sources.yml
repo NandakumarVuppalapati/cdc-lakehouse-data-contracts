@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: iceberg
+    schema: bronze
+    description: >
+      Raw Debezium CDC envelopes landed by the Iceberg Kafka Connect sink —
+      one row per change event, `before`/`after`/`op`/`source` preserved
+      exactly as Debezium emitted them. Never cleaned or deduped here on
+      purpose; that's Silver's job. See ADR 0012 for why each table has its
+      own dedicated sink connector.
+    tables:
+      - name: customers
+      - name: products
+      - name: orders
+      - name: order_items

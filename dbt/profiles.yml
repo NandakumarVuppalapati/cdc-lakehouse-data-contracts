@@ -1,0 +1,13 @@
+cdc_lakehouse:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      method: none
+      user: dbt
+      host: trino
+      port: 8080
+      database: iceberg
+      schema: silver
+      threads: 2
+      http_scheme: http
