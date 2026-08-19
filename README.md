@@ -15,11 +15,21 @@ at three independent points before bad data ever reaches a consumer.
 
 ## Status
 
-**Tier 0 — pipeline skeleton (this commit)**
+**Tier 0 — pipeline skeleton** — done, verified.
 Postgres → Debezium → Kafka → Iceberg (Bronze tables, MinIO + Nessie catalog) → queryable via Trino.
 
-**Tier 1 — contracts, orchestration, CI** — in progress
-**Tier 2 — lineage, IaC, chaos testing** — planned
+**Tier 1 — contracts, orchestration, CI** — built, mostly verified.
+All three contract-enforcement layers (Apicurio, dbt Model Contracts, Great
+Expectations), Dagster orchestration, and Prometheus + Grafana have each
+been brought up and exercised end to end with real data — see
+[`PORTFOLIO_ASSETS.md`](PORTFOLIO_ASSETS.md) for the actual captures,
+including two genuine, non-staged failures (a rejected schema change, a
+bad data value slipping past the shape-only layers and getting caught by
+the quality gate). The GitHub Actions CI workflow and the observability
+stack are code-complete and documented (see ADR 0023/0024) but haven't
+had their first real run yet — that's the one piece still open.
+
+**Tier 2 — lineage, IaC, chaos testing** — planned, not started.
 
 ## Stack
 
@@ -28,18 +38,18 @@ Postgres → Debezium → Kafka → Iceberg (Bronze tables, MinIO + Nessie catal
 | Source OLTP | PostgreSQL 16 |
 | CDC capture | Debezium (Kafka Connect) |
 | Streaming | Apache Kafka (KRaft mode) |
-| Schema contracts (ingestion) | Apicurio Registry *(Tier 1)* |
+| Schema contracts (ingestion) | Apicurio Registry |
 | Object storage | MinIO |
 | Table format | Apache Iceberg |
 | Catalog | Nessie |
 | Query engine | Trino |
 | Transformation | dbt Core (dbt-trino adapter), Model Contracts |
-| Data quality | Great Expectations *(Tier 1)* |
-| Orchestration | Dagster *(Tier 1)* |
-| Observability | Prometheus + Grafana *(Tier 1)* |
-| CI/CD | GitHub Actions *(Tier 1)* |
-| Lineage | OpenLineage + Marquez *(Tier 2)* |
-| IaC | Terraform *(Tier 2)* |
+| Data quality | Great Expectations |
+| Orchestration | Dagster |
+| Observability | Prometheus + Grafana *(built, first real run pending)* |
+| CI/CD | GitHub Actions *(built, first real run pending)* |
+| Lineage | OpenLineage + Marquez *(Tier 2 — planned)* |
+| IaC | Terraform *(Tier 2 — planned)* |
 
 ## Quickstart
 

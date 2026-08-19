@@ -24,8 +24,16 @@ register() {
     }
 }
 
-register "$(dirname "$0")/../kafka-connect/connectors/debezium-postgres-source.json"
-register "$(dirname "$0")/../kafka-connect/connectors/iceberg-sink.json"
+CONNECTORS_DIR="$(dirname "$0")/../kafka-connect/connectors"
+
+register "${CONNECTORS_DIR}/debezium-postgres-source.json"
+# One sink connector per table — see ADR 0012 for why this replaced a single
+# multi-topic connector (that pattern isn't actually supported without a
+# route-field and caused real record misrouting between tables).
+register "${CONNECTORS_DIR}/iceberg-sink-customers.json"
+register "${CONNECTORS_DIR}/iceberg-sink-products.json"
+register "${CONNECTORS_DIR}/iceberg-sink-orders.json"
+register "${CONNECTORS_DIR}/iceberg-sink-order-items.json"
 
 echo ""
 echo "Connector status:"

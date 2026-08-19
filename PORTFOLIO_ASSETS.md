@@ -10,18 +10,19 @@ Legend: `[ ]` not captured yet · `[x]` captured · file name is the target file
 
 ## Tier 0 — pipeline skeleton
 
-- [ ] `01-architecture-diagram.png` — exported version of docs/architecture.md's Mermaid diagram
-- [ ] `02-docker-compose-up.gif` — terminal recording of `docker compose up -d --build` succeeding end to end
-- [ ] `03-cdc-event-flow.gif` — INSERT into Postgres on the left, corresponding row appearing in Trino query on the right (split screen or two terminal panes)
-- [ ] `04-minio-console-warehouse.png` — MinIO console showing the Iceberg warehouse bucket with real table files
-- [ ] `05-nessie-commit-log.png` — Nessie's commit history showing table changes over time (the git-like versioning payoff)
+- [x] `01-architecture-diagram.svg` — hand-built diagram matching docs/architecture.md's flow, colored by Tier 0 (live) vs Tier 1 (planned), with the three contract-enforcement layers annotated
+- [x] `02-docker-compose-up.jpg` — terminal screenshot of `docker compose up -d` succeeding end to end, all 8 services healthy/running
+- [x] `03-cdc-event-flow.jpg` — INSERT into Postgres, then the new row appearing in the Trino query with `op:"c"`, captured in one screenshot
+- [x] `04-minio-console-warehouse.jpg` — MinIO console showing the Iceberg warehouse bucket with real table files
+- [x] `05-nessie-commit-log.jpg` — Nessie's commit history showing table changes over time (the git-like versioning payoff)
 
 ## Tier 1 — contracts, orchestration, CI
 
-- [ ] `06-apicurio-rejection.png` — Apicurio Registry rejecting an incompatible schema, with the error message visible
-- [ ] `07-dbt-contract-failure.png` — terminal output of `dbt run` failing with a Model Contract violation, error text visible
-- [ ] `08-great-expectations-failure.png` — a Great Expectations checkpoint failing with the specific expectation that tripped
-- [ ] `09-dagster-lineage-graph.png` — Dagster's asset graph showing the full pipeline as connected, contracted assets
+- [x] `06-apicurio-rejection.jpg` — Kafka Connect task FAILED after an incompatible Avro schema change (price_cents INTEGER -> BOOLEAN) hit an Apicurio artifact-level BACKWARD compatibility rule; full stack trace visible, task-level status (not connector-level) as the tell
+- [x] `07-dbt-contract-failure.jpg` — terminal output of `dbt run` failing with a Model Contract violation, error text visible
+- [x] `08-great-expectations-failure.jpg` — `expect_column_values_to_be_in_set` on `gold_order_summary.status` failing after a typo'd status (`'shpped'`) was written directly to Postgres; dbt's contract (layer 2) let it through untouched since it only checks type, not allowed values
+- [x] `09-dagster-lineage-graph.jpg` — Dagster's asset lineage view showing Silver -> Gold with real materialization timestamps and asset-check pass counts (3/3, 4/4) after a genuine "Materialize all" run
+- [x] `09b-dagster-asset-checks.jpg` (bonus) — the `gold_order_summary` Checks tab: the blocking GX check plus 3 dbt-derived checks, all succeeded, full `gx_result` visible
 - [ ] `10-ci-breaking-change-test.png` or `.gif` — the GitHub Actions run log where the pipeline is deliberately broken and CI catches it (this is the single most important asset — it's the proof for the whole project's thesis)
 - [ ] `11-grafana-dashboard.png` — Grafana dashboard showing consumer lag / run duration / contract-violation count metrics
 
