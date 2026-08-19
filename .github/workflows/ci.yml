@@ -1,0 +1,194 @@
+name: CDC Lakehouse CI
+
+# Full-pipeline CI: brings up the entire docker-compose stack (real Postgres
+# -> Debezium -> Kafka -> Apicurio -> Iceberg sink -> Bronze), runs the
+# happy-path dbt build + Great Expectations checkpoint, then deliberately
+# writes a bad value straight into the source database and asserts the
+# pipeline's own contract layers catch it. Nothing here is seeded directly
+# into Iceberg — every row Trino ever sees in this workflow arrived via the
+# real CDC path, same as local dev. See ADR 0023 for the design rationale
+# and the parts of this that are still unverified against a live run.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  full-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker / Compose versions
+        run: |
+          docker version
+          docker compose version
+
+      # Only the infra tier — deliberately excludes `dagster` (long-running,
+      # not needed to prove the pipeline/contracts in CI) and lets `dbt`'s
+      # default one-shot `--version` command sit out too; both are invoked
+      # explicitly later via `docker compose run --rm`. `great-expectations`
+      # is already excluded by its own `profiles: [jobs]`. Keeping the
+      # simultaneous JVM footprint (Kafka, Kafka Connect, Trino, Nessie,
+      # Apicurio) as small as it can be, given GitHub-hosted public runners
+      # are 4 vCPU / 16GB — see ADR 0023.
+      #
+      # `--wait` blocks until every started service's healthcheck (or, for
+      # trino-init, its completion condition) is satisfied, instead of a
+      # hand-rolled sleep loop.
+      - name: Bring up the lakehouse stack
+        run: |
+          docker compose up -d --wait --wait-timeout 300 \
+            postgres kafka kafka-connect minio minio-init nessie trino trino-init apicurio
+
+      - name: Register Debezium + Iceberg sink connectors
+        run: bash scripts/register-connectors.sh
+
+      # A connector can be *registered* successfully while its task is
+      # FAILED underneath it (ADR 0021 hit exactly this with a poisoned WAL
+      # replay) — register-connectors.sh's own exit code doesn't catch that
+      # case, so check task state explicitly here rather than assuming
+      # "registered" means "running".
+      - name: Verify all connector tasks are RUNNING
+        run: |
+          status_json=$(curl -sf "http://localhost:8083/connectors?expand=status")
+          echo "$status_json" | python3 -m json.tool
+          bad=$(echo "$status_json" | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)
+          bad = []
+          for name, entry in data.items():
+              st = entry["status"]
+              conn_state = st["connector"]["state"]
+              if conn_state != "RUNNING":
+                  bad.append(name + " connector=" + conn_state)
+              for t in st["tasks"]:
+                  task_state = t["state"]
+                  if task_state != "RUNNING":
+                      bad.append(name + " task" + str(t["id"]) + "=" + task_state)
+          print(chr(10).join(bad))
+          ')
+          if [ -n "$bad" ]; then
+            echo "::error::One or more connectors/tasks are not RUNNING:"
+            echo "$bad"
+            exit 1
+          fi
+          echo "All connectors and tasks RUNNING."
+
+      # Bronze schema is the raw Debezium envelope (before/after/op/ts_ms —
+      # see sources.yml), landed via the real Kafka Connect Iceberg sink
+      # (10s commit interval, see iceberg-sink-orders.json), so this is
+      # proof the full CDC path is actually flowing, not just that
+      # Postgres has seed rows.
+      - name: Wait for seed data to reach Bronze via CDC
+        run: |
+          for i in $(seq 1 30); do
+            count=$(docker exec lakehouse-trino trino --server http://localhost:8080 \
+              --catalog iceberg --schema bronze --output-format CSV \
+              --execute "SELECT count(*) FROM orders" 2>/dev/null | tr -d '"' | tail -1)
+            if [ -n "$count" ] && [ "$count" -ge 3 ] 2>/dev/null; then
+              echo "bronze.orders has ${count} rows — CDC path confirmed."
+              exit 0
+            fi
+            echo "waiting for bronze.orders (attempt $i/30, count=${count:-0})..."
+            sleep 10
+          done
+          echo "::error::bronze.orders never reached the expected seed row count — CDC path did not flow."
+          docker compose logs kafka-connect --tail 200
+          exit 1
+
+      - name: dbt build (happy path — expected to pass)
+        run: docker compose run --rm dbt build
+
+      - name: Great Expectations checkpoint (happy path — expected to pass)
+        run: docker compose run --rm great-expectations
+
+      # The breaking change: a typo'd status value written straight to the
+      # source OLTP table. dbt's Model Contract (layer 2) only checks column
+      # names/types, so it will NOT catch this — this is specifically the
+      # gap Great Expectations (layer 3) exists to close. Same demo already
+      # proven manually and captured as docs/assets/08-great-expectations-failure.jpg.
+      - name: Inject a contract-breaking value into Postgres
+        run: |
+          docker exec lakehouse-postgres psql -U lakehouse -d sourcedb -c \
+            "UPDATE shop.orders SET status = 'shpped' WHERE order_id = 2;"
+
+      - name: Wait for the bad value to land in Bronze via CDC
+        run: |
+          for i in $(seq 1 30); do
+            status=$(docker exec lakehouse-trino trino --server http://localhost:8080 \
+              --catalog iceberg --schema bronze --output-format CSV \
+              --execute "SELECT after.status FROM orders WHERE after.order_id = 2 ORDER BY ts_ms DESC LIMIT 1" \
+              2>/dev/null | tr -d '"' | tail -1)
+            if [ "$status" = "shpped" ]; then
+              echo "bronze.orders reflects the bad value — CDC path confirmed for the breaking change."
+              exit 0
+            fi
+            echo "waiting for the 'shpped' event in bronze.orders (attempt $i/30, current=${status:-<none>})..."
+            sleep 10
+          done
+          echo "::error::the injected bad value never reached bronze.orders."
+          docker compose logs kafka-connect --tail 200
+          exit 1
+
+      # Expected to SUCCEED. This is the point of the demo: a Model Contract
+      # only validates shape (column names/types), and `status` is still a
+      # valid varchar — 'shpped' is exactly as well-typed as 'shipped'. If
+      # this step fails, something *else* broke (not the thing we injected).
+      - name: dbt build after the breaking change (expected to pass — contracts are shape-only)
+        run: docker compose run --rm dbt build
+
+      # Expected to FAIL. Exit-code expectation is deliberately inverted:
+      # `docker compose run` exiting non-zero here means Great Expectations
+      # correctly caught expect_column_values_to_be_in_set on `status`. If
+      # it exits 0 instead, contract layer 3 failed to catch a real
+      # regression it exists to catch — that must fail the CI job, not pass
+      # it, so this step turns a GX *pass* into a workflow *failure*.
+      - name: Great Expectations checkpoint (expected to FAIL and catch the bad value)
+        run: |
+          set +e
+          docker compose run --rm great-expectations
+          gx_exit=$?
+          set -e
+          if [ "$gx_exit" -eq 0 ]; then
+            echo "::error::GX checkpoint PASSED on a known-bad value ('shpped') — contract layer 3 failed to catch a real data quality regression."
+            exit 1
+          fi
+          echo "GX checkpoint correctly failed (exit ${gx_exit}) on the injected bad value."
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### CDC Lakehouse CI"
+            echo ""
+            echo "- Full docker-compose stack brought up, CDC path exercised end to end (Postgres -> Debezium -> Kafka -> Apicurio -> Iceberg sink -> Bronze)."
+            echo "- Happy-path \`dbt build\` + Great Expectations checkpoint: passed."
+            echo "- Injected \`status = 'shpped'\` directly into Postgres."
+            echo "- dbt Model Contract (layer 2, shape-only): did not catch it — by design."
+            echo "- Great Expectations (layer 3, value-level): caught it — job asserts this explicitly."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Dump service logs on failure
+        if: failure()
+        run: docker compose logs > compose-logs.txt
+
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compose-logs
+          path: compose-logs.txt
+          retention-days: 7
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
