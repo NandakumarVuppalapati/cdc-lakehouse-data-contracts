@@ -23,7 +23,7 @@ Legend: `[ ]` not captured yet · `[x]` captured · file name is the target file
 - [x] `08-great-expectations-failure.jpg` — `expect_column_values_to_be_in_set` on `gold_order_summary.status` failing after a typo'd status (`'shpped'`) was written directly to Postgres; dbt's contract (layer 2) let it through untouched since it only checks type, not allowed values
 - [x] `09-dagster-lineage-graph.jpg` — Dagster's asset lineage view showing Silver -> Gold with real materialization timestamps and asset-check pass counts (3/3, 4/4) after a genuine "Materialize all" run
 - [x] `09b-dagster-asset-checks.jpg` (bonus) — the `gold_order_summary` Checks tab: the blocking GX check plus 3 dbt-derived checks, all succeeded, full `gx_result` visible
-- [ ] `10-ci-breaking-change-test.png` or `.gif` — the GitHub Actions run log where the pipeline is deliberately broken and CI catches it (this is the single most important asset — it's the proof for the whole project's thesis)
+- [x] `10-ci-breaking-change-test.jpg` — real GitHub Actions run (github.com/NandakumarVuppalapati/cdc-lakehouse-data-contracts/actions/runs/32380180469), `full-pipeline` job succeeded in 5m 33s: full stack up, real CDC flow, happy-path pass, then the injected `'shpped'` typo correctly caught by Great Expectations while dbt's shape-only contract correctly let it through — this is the single most important asset, and it's a real run, not a mockup
 - [ ] `11-grafana-dashboard.png` — Grafana dashboard showing consumer lag / run duration / contract-violation count metrics
 
 ## Tier 2 — stretch (capture whichever get built)

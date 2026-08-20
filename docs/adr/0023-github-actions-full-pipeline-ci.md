@@ -111,26 +111,38 @@ way, depending on how much RAM Docker Desktop was given locally.
   real run OOMs.
 
 ## Consequences
-- **This has not been run against real GitHub Actions.** `git remote -v`
-  on this repo returns nothing — there's no GitHub remote configured yet,
-  so nothing has triggered this workflow. Everything in it is built
-  against the project's own already-proven local commands
-  (`register-connectors.sh`, the retry-loop pattern from
-  `trino-init/init-schemas.sh`, the exact Bronze schema shape used in
-  `silver_orders.sql`) and documented tool behavior (Compose `--wait`,
-  GitHub-hosted runner specs), not assumption — but "verified against
-  primary sources" is not the same guarantee as "verified by actually
-  running it," which is this project's normal bar (every other ADR here
-  reflects a real run, including real failures). The honest status is:
-  designed carefully, not yet exercised. First real run should be treated
-  as a debugging session, not a formality — most likely failure points are
-  Kafka Connect readiness timing (no healthcheck defined on that service
-  today) and runner memory pressure under five simultaneous JVMs.
-- Once pushed and green, `10-ci-breaking-change-test.png` (or a GIF of the
-  Summary tab) becomes capturable — still marked `[ ]` in
-  PORTFOLIO_ASSETS.md until that real run exists.
 - CI runtime is expected to be several minutes slower than a
   seeded-data-only approach would have been (image builds + full stack
   health-wait + two full dbt+GX cycles + two CDC-propagation polls) — an
   accepted, explicit trade for the fidelity of the "full pipeline" scope
   chosen.
+
+## Verified (2026-08-20)
+Pushed to `github.com/NandakumarVuppalapati/cdc-lakehouse-data-contracts`
+and run for real on GitHub-hosted infrastructure — not just designed
+against primary sources, actually exercised, matching this project's
+normal bar. Run #2
+(`actions/runs/32380180469`, commit `96797b8`) — `full-pipeline` job
+**succeeded in 5m 33s**. Concretely, on a real GitHub-hosted runner: the
+full stack came up healthy, all connectors registered and were confirmed
+`RUNNING` (not just registered), seed data was confirmed to reach
+`bronze.orders` via real CDC, the happy-path `dbt build` + Great
+Expectations checkpoint both passed, the `'shpped'` typo was injected
+into Postgres and confirmed to propagate through CDC again, `dbt build`
+correctly still passed against it (contract layer 2 is shape-only, as
+designed), and the Great Expectations checkpoint correctly failed on it —
+which the workflow's inverted exit-code assertion correctly turned into
+a job pass. None of the anticipated failure points (Kafka Connect
+readiness timing, runner memory pressure under five simultaneous JVMs)
+actually materialized on this first attempt.
+
+One real hiccup, not a bug: run #1 (triggered by the first push, which
+included this whole workflow for the first time) got auto-cancelled by
+this file's own `concurrency: cancel-in-progress` setting when the
+second push (a one-line doc fix) landed a few seconds later — exactly the
+behavior that setting is documented above to produce, confirmed working
+as intended rather than mistaken for a failure.
+
+Captured as `docs/assets/10-ci-breaking-change-test.jpg` (the run's
+Summary tab, showing the job-summary bullets written into this workflow)
+— PORTFOLIO_ASSETS.md item 10 updated accordingly.
