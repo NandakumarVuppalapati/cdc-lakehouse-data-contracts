@@ -18,18 +18,27 @@ at three independent points before bad data ever reaches a consumer.
 **Tier 0 — pipeline skeleton** — done, verified.
 Postgres → Debezium → Kafka → Iceberg (Bronze tables, MinIO + Nessie catalog) → queryable via Trino.
 
-**Tier 1 — contracts, orchestration, CI** — built, mostly verified.
+**Tier 1 — contracts, orchestration, CI** — done, verified.
 All three contract-enforcement layers (Apicurio, dbt Model Contracts, Great
-Expectations), Dagster orchestration, and Prometheus + Grafana have each
-been brought up and exercised end to end with real data — see
+Expectations), Dagster orchestration, and GitHub Actions CI have each been
+brought up and exercised end to end with real data — see
 [`PORTFOLIO_ASSETS.md`](PORTFOLIO_ASSETS.md) for the actual captures,
-including two genuine, non-staged failures (a rejected schema change, a
+including three genuine, non-staged failures (a rejected schema change, a
 bad data value slipping past the shape-only layers and getting caught by
-the quality gate). The GitHub Actions CI workflow and the observability
-stack are code-complete and documented (see ADR 0023/0024) but haven't
-had their first real run yet — that's the one piece still open.
+the quality gate, and CI catching the same class of break on a full real
+stack it brings up itself — see ADR 0023). Prometheus + Grafana are
+code-complete and documented (ADR 0024) but haven't had their first real
+run yet — the one piece of Tier 1 still open.
 
-**Tier 2 — lineage, IaC, chaos testing** — planned, not started.
+**Tier 2 — lineage, IaC, chaos testing** — code-complete, first live
+verification runs pending. Column-level lineage (OpenLineage + Marquez,
+ADR 0025), infrastructure-as-code (Terraform, ADR 0026), and a Kafka
+broker chaos test with measured recovery (ADR 0027) are all built and
+documented against real, confirmed sources — none have been run against a
+live stack yet (this project's tooling has no Docker access this session;
+see each ADR's Consequences section). Same "built honestly, marked
+honestly" status as the Tier 1 observability gap above, not swept under
+different language.
 
 ## Stack
 
@@ -47,9 +56,10 @@ had their first real run yet — that's the one piece still open.
 | Data quality | Great Expectations |
 | Orchestration | Dagster |
 | Observability | Prometheus + Grafana *(built, first real run pending)* |
-| CI/CD | GitHub Actions *(built, first real run pending)* |
-| Lineage | OpenLineage + Marquez *(Tier 2 — planned)* |
-| IaC | Terraform *(Tier 2 — planned)* |
+| CI/CD | GitHub Actions |
+| Lineage | OpenLineage + Marquez *(Tier 2 — built, first real run pending)* |
+| IaC | Terraform *(Tier 2 — built, first real run pending)* |
+| Chaos testing | Kafka broker kill + measured recovery *(Tier 2 — built, first real run pending)* |
 
 ## Quickstart
 
@@ -75,6 +85,22 @@ docker exec -it lakehouse-trino trino --catalog iceberg --schema bronze \
 MinIO console: http://localhost:9001 (minioadmin / minioadmin)
 Nessie API: http://localhost:19120
 Kafka Connect REST: http://localhost:8083
+Dagster: http://localhost:3000 · Grafana: http://localhost:3001 · Marquez: http://localhost:3002
+
+### Tier 2 extras
+
+```bash
+# Column-level lineage: build twice (the 2nd run carries column detail — see ADR 0025)
+docker compose run --rm dbt build
+docker compose run --rm dbt build
+
+# IaC: provision the same stack declaratively instead of `docker compose up`
+docker compose down
+cd infra/terraform/local && terraform init && terraform apply
+
+# Chaos test: kill the broker, watch it recover, get a measured recovery time
+python chaos/kafka_broker_chaos_test.py
+```
 
 ## Why these choices
 

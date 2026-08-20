@@ -67,14 +67,20 @@ flowchart LR
 Tier 0: Postgres -> Debezium -> Kafka -> Iceberg (Bronze) -> Trino, queryable. Done, verified.
 
 Tier 1: Apicurio contracts, dbt Silver/Gold with Model Contracts, Great
-Expectations, and Dagster orchestration are all built and verified end to
-end with real data, including two genuine (not staged) failures — see
-`PORTFOLIO_ASSETS.md`. Prometheus + Grafana and the GitHub Actions
-breaking-change CI workflow are code-complete (ADR 0023, ADR 0024) but
-haven't had a first real run yet — no GitHub remote is configured for CI
-to trigger against, and the observability stack hasn't been brought up on
-a live run. That's the one thing left open in this tier.
+Expectations, Dagster orchestration, and GitHub Actions CI are all built
+and verified end to end with real data, including three genuine (not
+staged) failures — see `PORTFOLIO_ASSETS.md`. CI's breaking-change test
+has a real, successful run on GitHub Actions (ADR 0023's Verified
+section). Prometheus + Grafana are code-complete (ADR 0024) but haven't
+had a first real run yet — the one thing left open in this tier.
 
-Tier 2 (stretch, not started): OpenLineage/Marquez, Terraform IaC, chaos testing.
+Tier 2 (code-complete, first live runs pending): OpenLineage/Marquez
+column-level lineage (ADR 0025), Terraform IaC for the local stack
+(ADR 0026), and a Kafka broker chaos test with measured recovery
+(ADR 0027) are all built and documented against real, confirmed sources —
+this project's tooling had no Docker access during the session that wrote
+them, so none have run against a live stack yet. Same status as the Tier
+1 observability gap above: designed and documented carefully, not yet
+observed working.
 
 See [`docs/adr/`](./adr) for the reasoning behind each major decision (why Nessie over Polaris, why Dagster over Airflow, etc.) and [`PORTFOLIO_ASSETS.md`](../PORTFOLIO_ASSETS.md) for what gets captured at each milestone.

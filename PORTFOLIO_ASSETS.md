@@ -24,13 +24,13 @@ Legend: `[ ]` not captured yet · `[x]` captured · file name is the target file
 - [x] `09-dagster-lineage-graph.jpg` — Dagster's asset lineage view showing Silver -> Gold with real materialization timestamps and asset-check pass counts (3/3, 4/4) after a genuine "Materialize all" run
 - [x] `09b-dagster-asset-checks.jpg` (bonus) — the `gold_order_summary` Checks tab: the blocking GX check plus 3 dbt-derived checks, all succeeded, full `gx_result` visible
 - [x] `10-ci-breaking-change-test.jpg` — real GitHub Actions run (github.com/NandakumarVuppalapati/cdc-lakehouse-data-contracts/actions/runs/32380180469), `full-pipeline` job succeeded in 5m 33s: full stack up, real CDC flow, happy-path pass, then the injected `'shpped'` typo correctly caught by Great Expectations while dbt's shape-only contract correctly let it through — this is the single most important asset, and it's a real run, not a mockup
-- [ ] `11-grafana-dashboard.png` — Grafana dashboard showing consumer lag / run duration / contract-violation count metrics
+- [ ] `11-grafana-dashboard.png` — Grafana dashboard showing consumer lag / run duration / contract-violation count metrics. Code-complete (docker-compose.yml, observability/, ADR 0024); a real `docker compose up -d prometheus pushgateway kafka-exporter grafana` plus at least one `dbt build` / GX checkpoint run is the only thing left before this can be captured.
 
-## Tier 2 — stretch (capture whichever get built)
+## Tier 2 — column-level lineage, IaC, chaos testing
 
-- [ ] `12-openlineage-graph.png` — column-level lineage view in Marquez
-- [ ] `13-terraform-apply.gif` — `terraform apply` provisioning the local stack declaratively
-- [ ] `14-chaos-test-recovery.png` — logs showing the pipeline recovering after a killed Kafka broker / corrupted message, with the recovery time noted
+- [ ] `12-openlineage-graph.png` — column-level lineage view in Marquez. Code-complete (docker-compose.yml's marquez-db/marquez-api/marquez-web, dbt-ol wiring, ADR 0025); needs two real `docker compose run --rm dbt build` invocations (the second one carries column detail — see ADR 0025) before capture.
+- [ ] `13-terraform-apply.gif` — `terraform apply` provisioning the local stack declaratively. Code-complete (`infra/terraform/local/`, ADR 0026); HCL syntax-checked, not yet run against a live Docker daemon — needs the user's own `terraform init && terraform apply`.
+- [ ] `14-chaos-test-recovery.png` — logs showing the pipeline recovering after a killed Kafka broker, with the recovery time noted. Code-complete (`chaos/kafka_broker_chaos_test.py`, ADR 0027); needs a real run against the live stack.
 
 ## Narrative assets (write once the above exist, not before)
 
