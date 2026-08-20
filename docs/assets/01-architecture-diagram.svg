@@ -1,262 +1,169 @@
-<svg viewBox="0 0 1700 760" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 1940 800" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <radialGradient id="bgGlow" cx="18%" cy="10%" r="90%">
+    <radialGradient id="bgGlow" cx="14%" cy="8%" r="95%">
       <stop offset="0%" stop-color="#0e1120"/>
       <stop offset="55%" stop-color="#06070c"/>
       <stop offset="100%" stop-color="#020203"/>
     </radialGradient>
-
     <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#5eead4"/>
       <stop offset="55%" stop-color="#818cf8"/>
       <stop offset="100%" stop-color="#f472b6"/>
     </linearGradient>
-
-    <filter id="cardShadow" x="-40%" y="-40%" width="180%" height="180%">
-      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000000" flood-opacity="0.45"/>
-    </filter>
-
     <filter id="liveGlow" x="-80%" y="-80%" width="260%" height="260%">
-      <feGaussianBlur stdDeviation="7" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-
     <pattern id="dotGrid" width="26" height="26" patternUnits="userSpaceOnUse">
       <circle cx="1.2" cy="1.2" r="1.2" fill="#ffffff" fill-opacity="0.035"/>
     </pattern>
-
-    <marker id="arrowLive" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+    <marker id="arrowLive" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#5eead4"/>
     </marker>
-    <marker id="arrowPlanned" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <marker id="arrowPend" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#fbbf24"/>
     </marker>
   </defs>
 
-  <rect x="0" y="0" width="1700" height="760" fill="url(#bgGlow)"/>
-  <rect x="0" y="0" width="1700" height="760" fill="url(#dotGrid)"/>
+  <rect x="0" y="0" width="1940" height="800" fill="url(#bgGlow)"/>
+  <rect x="0" y="0" width="1940" height="800" fill="url(#dotGrid)"/>
 
-  <!-- ===== Header ===== -->
-  <text x="56" y="66" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="30" font-weight="700" fill="url(#titleGrad)">CDC Lakehouse</text>
-  <text x="56" y="66" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="30" font-weight="700" fill="#e9ebf5" opacity="0">CDC Lakehouse</text>
-  <text x="320" y="66" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="30" font-weight="700" fill="#e9ebf5">with Data Contracts</text>
-  <text x="56" y="92" font-family="'JetBrains Mono',monospace" font-size="13.5" fill="#8b91a8">Postgres &#8594; Debezium &#8594; Kafka &#8594; Apache Iceberg &#8594; dbt &#8212; three independent layers catch a bad schema change before it reaches a dashboard</text>
-  <line x1="56" y1="112" x2="1644" y2="112" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+  <!-- Header -->
+  <text x="70" y="60" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="32" font-weight="700" fill="url(#titleGrad)">CDC Lakehouse</text>
+  <text x="70" y="60" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="32" font-weight="700" fill="#e9ebf5" opacity="0">CDC Lakehouse</text>
+  <text x="368" y="60" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="32" font-weight="700" fill="#e9ebf5">with Data Contracts</text>
+  <text x="70" y="88" font-family="'JetBrains Mono',monospace" font-size="14" fill="#8b91a8">Postgres &#8594; Debezium &#8594; Kafka &#8594; Apache Iceberg &#8594; dbt &#8212; three independent layers catch a bad schema change before it reaches a dashboard</text>
+  <line x1="70" y1="108" x2="1870" y2="108" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
 
   <!-- Legend -->
-  <g font-family="'JetBrains Mono',monospace" font-size="12.5">
-    <circle cx="1330" cy="46" r="4.5" fill="#5eead4"/>
-    <text x="1343" y="50" fill="#c7cade">Live &#8212; verified end-to-end</text>
-    <circle cx="1330" cy="70" r="4.5" fill="#fbbf24" fill-opacity="0.85"/>
-    <text x="1343" y="74" fill="#75798c">Built &#8212; first live run pending</text>
+  <g font-family="'JetBrains Mono',monospace" font-size="13">
+    <circle cx="1610" cy="46" r="5" fill="#5eead4"/>
+    <text x="1624" y="50" fill="#c7cade">Live &#8212; verified end-to-end</text>
+    <circle cx="1610" cy="72" r="5" fill="#fbbf24" fill-opacity="0.9"/>
+    <text x="1624" y="76" fill="#75798c">Built &#8212; first live run pending</text>
   </g>
 
-  <!-- ===== Stage labels ===== -->
-  <g font-family="'JetBrains Mono',monospace" font-size="11" letter-spacing="2.5" fill="#5b6178">
-    <text x="98" y="168">SOURCE</text>
-    <text x="330" y="168">CAPTURE</text>
-    <text x="560" y="168">STREAM</text>
-    <text x="800" y="168">LAKEHOUSE</text>
-    <text x="1080" y="168">TRANSFORM</text>
-    <text x="1330" y="168">ORCHESTRATE</text>
-    <text x="1560" y="168">OBSERVE</text>
-  </g>
+  <!-- Lanes -->
+  <rect x="52" y="152" width="246" height="176" rx="16" fill="#ffffff" fill-opacity="0.018" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+  <text x="175.0" y="178" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" letter-spacing="3" fill="#5b6178">SOURCE</text>
+  <rect x="317" y="152" width="246" height="176" rx="16" fill="#ffffff" fill-opacity="0.018" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+  <text x="440.0" y="178" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" letter-spacing="3" fill="#5b6178">CAPTURE</text>
+  <rect x="582" y="152" width="246" height="300" rx="16" fill="#ffffff" fill-opacity="0.018" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+  <text x="705.0" y="178" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" letter-spacing="3" fill="#5b6178">STREAM</text>
+  <rect x="847" y="152" width="246" height="424" rx="16" fill="#ffffff" fill-opacity="0.018" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+  <text x="970.0" y="178" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" letter-spacing="3" fill="#5b6178">LAKEHOUSE</text>
+  <rect x="1112" y="152" width="246" height="424" rx="16" fill="#ffffff" fill-opacity="0.018" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+  <text x="1235.0" y="178" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" letter-spacing="3" fill="#5b6178">TRANSFORM</text>
+  <rect x="1377" y="152" width="246" height="176" rx="16" fill="#ffffff" fill-opacity="0.018" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+  <text x="1500.0" y="178" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" letter-spacing="3" fill="#5b6178">ORCHESTRATE</text>
+  <rect x="1642" y="152" width="246" height="300" rx="16" fill="#ffffff" fill-opacity="0.018" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+  <text x="1765.0" y="178" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" letter-spacing="3" fill="#5b6178">OBSERVE</text>
 
-  <!-- ===== Connectors (drawn first, under nodes) ===== -->
-  <g fill="none" stroke-width="2.25" stroke="#5eead4" marker-end="url(#arrowLive)" opacity="0.9">
-    <path d="M204,300 C238,300 246,300 280,300"/>
-    <path d="M444,300 C470,300 478,300 504,300"/>
-    <path d="M674,300 C706,300 716,300 748,300"/>
-    <path d="M918,285 C955,255 970,235 985,215"/>
-    <path d="M918,315 C955,350 970,375 985,400"/>
-    <path d="M1145,235 C1175,255 1190,270 1204,290"/>
-    <path d="M1145,375 C1175,350 1190,335 1204,310"/>
-    <path d="M564,335 C564,375 564,395 564,428"/>
-    <path d="M1264,340 C1290,300 1305,270 1318,235"/>
-    <path d="M1264,350 C1290,352 1305,352 1318,352"/>
-    <path d="M1380,435 C1380,460 1380,470 1380,485"/>
-  </g>
-  <text font-family="'JetBrains Mono',monospace" font-size="10.5" fill="#4c7c72">
-    <textPath href="#pgArc">wal2json / pgoutput</textPath>
-  </text>
-  <path id="pgArc" d="M204,300 L280,300" fill="none" opacity="0"/>
-  <text x="242" y="290" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="#4c7c72">WAL</text>
-  <text x="474" y="290" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="#4c7c72">CDC events</text>
+  <!-- Edges -->
+  <path d="M280,249.0 L325,249.0" fill="none" stroke="#5eead4" stroke-width="2.25" marker-end="url(#arrowLive)" opacity="0.95"/>
+  <path d="M545,249.0 L590,249.0" fill="none" stroke="#5eead4" stroke-width="2.25" marker-end="url(#arrowLive)" opacity="0.95"/>
+  <path d="M810,249.0 L855,249.0" fill="none" stroke="#5eead4" stroke-width="2.25" marker-end="url(#arrowLive)" opacity="0.95"/>
+  <path d="M1075,249.0 L1120,249.0" fill="none" stroke="#5eead4" stroke-width="2.25" marker-end="url(#arrowLive)" opacity="0.95"/>
+  <path d="M1340,249.0 L1385,249.0" fill="none" stroke="#5eead4" stroke-width="2.25" marker-end="url(#arrowLive)" opacity="0.95"/>
+  <path d="M1605,249.0 L1650,249.0" fill="none" stroke="#fbbf24" stroke-width="2.25" stroke-dasharray="2,5" marker-end="url(#arrowPend)" opacity="0.95"/>
+  <path d="M705.0,288 L705.0,324" fill="none" stroke="#5eead4" stroke-width="2" marker-end="url(#arrowLive)" opacity="0.9"/>
+  <path d="M970.0,288 L970.0,324" fill="none" stroke="#5eead4" stroke-width="2" marker-end="url(#arrowLive)" opacity="0.9"/>
+  <path d="M970.0,412 L970.0,448" fill="none" stroke="#5eead4" stroke-width="2" marker-end="url(#arrowLive)" opacity="0.9"/>
+  <path d="M1235.0,288 L1235.0,324" fill="none" stroke="#5eead4" stroke-width="2" marker-end="url(#arrowLive)" opacity="0.9"/>
+  <path d="M1235.0,412 L1235.0,448" fill="none" stroke="#5eead4" stroke-width="2" marker-end="url(#arrowLive)" opacity="0.9"/>
+  <path d="M1765.0,288 L1765.0,324" fill="none" stroke="#fbbf24" stroke-width="2" stroke-dasharray="2,5" marker-end="url(#arrowPend)" opacity="0.9"/>
 
-  <g fill="none" stroke-width="1.6" stroke="#fbbf24" stroke-dasharray="1,5" stroke-linecap="round" marker-end="url(#arrowPlanned)" opacity="0.85">
-    <path d="M1444,510 C1480,495 1500,485 1524,462"/>
-    <path d="M1590,388 C1590,415 1590,425 1590,443"/>
-  </g>
-
-  <!-- ===================== NODES ===================== -->
-
-  <!-- Postgres (live) -->
-  <g filter="url(#liveGlow)">
-    <rect x="64" y="264" width="140" height="72" rx="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/>
-  </g>
-  <g font-family="'Space Grotesk','Segoe UI',sans-serif">
-    <ellipse cx="88" cy="284" rx="9" ry="4" fill="none" stroke="#5eead4" stroke-width="1.6"/>
-    <path d="M79,284 L79,296 Q79,300 88,300 Q97,300 97,296 L97,284" fill="none" stroke="#5eead4" stroke-width="1.6"/>
-    <path d="M79,290 Q88,294 97,290" fill="none" stroke="#5eead4" stroke-width="1.2" opacity="0.7"/>
-    <text x="115" y="300" font-size="14.5" font-weight="600" fill="#eef0f9">PostgreSQL</text>
-    <text x="115" y="317" font-size="10.5" fill="#8b91a8">shop schema</text>
-  </g>
-
-  <!-- Debezium (live) -->
-  <g filter="url(#liveGlow)">
-    <rect x="284" y="264" width="160" height="72" rx="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/>
+  <!-- Nodes -->
+  <g>
+    <g filter="url(#liveGlow)"><rect x="70" y="210" width="210" height="78" rx="14" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/></g>
+    <text x="90" y="242" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#eef0f9">PostgreSQL</text>
+    <text x="90" y="263" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#8b91a8">shop schema (OLTP source)</text>
   </g>
   <g>
-    <path d="M312,290 A10,10 0 1 1 311,292" fill="none" stroke="#5eead4" stroke-width="1.6"/>
-    <path d="M320,282 L312,290 L320,296" fill="none" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="336" y="300" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="14.5" font-weight="600" fill="#eef0f9">Debezium</text>
-    <text x="336" y="317" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="10.5" fill="#8b91a8">Postgres connector</text>
-  </g>
-
-  <!-- Kafka (live) -->
-  <g filter="url(#liveGlow)">
-    <rect x="508" y="264" width="150" height="72" rx="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/>
+    <g filter="url(#liveGlow)"><rect x="335" y="210" width="210" height="78" rx="14" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/></g>
+    <text x="355" y="242" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#eef0f9">Debezium</text>
+    <text x="355" y="263" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#8b91a8">Postgres CDC connector</text>
   </g>
   <g>
-    <circle cx="532" cy="290" r="2.6" fill="#5eead4"/>
-    <circle cx="540" cy="283" r="2.6" fill="#5eead4"/>
-    <circle cx="540" cy="297" r="2.6" fill="#5eead4"/>
-    <line x1="532" y1="290" x2="540" y2="283" stroke="#5eead4" stroke-width="1.2"/>
-    <line x1="532" y1="290" x2="540" y2="297" stroke="#5eead4" stroke-width="1.2"/>
-    <text x="558" y="300" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="14.5" font-weight="600" fill="#eef0f9">Apache Kafka</text>
-    <text x="558" y="317" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="10.5" fill="#8b91a8">KRaft mode, single broker</text>
-  </g>
-
-  <!-- Apicurio (live) -->
-  <g filter="url(#liveGlow)">
-    <rect x="474" y="428" width="180" height="72" rx="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/>
+    <g filter="url(#liveGlow)"><rect x="600" y="210" width="210" height="78" rx="14" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/></g>
+    <text x="620" y="242" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#eef0f9">Apache Kafka</text>
+    <text x="620" y="263" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#8b91a8">KRaft mode, single broker</text>
   </g>
   <g>
-    <path d="M500,450 L508,442 L516,450 L508,466 Z" fill="none" stroke="#5eead4" stroke-width="1.4"/>
-    <text x="530" y="464" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="14" font-weight="600" fill="#eef0f9">Apicurio Registry</text>
-    <text x="530" y="480" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="10.5" fill="#8b91a8">schema contracts &#8212; layer 1</text>
-  </g>
-  <circle cx="497" cy="438" r="10" fill="#0c0e18" stroke="#5eead4" stroke-width="1.3"/>
-  <text x="497" y="442" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10.5" font-weight="700" fill="#5eead4">1</text>
-
-  <!-- Iceberg sink (live) -->
-  <g filter="url(#liveGlow)">
-    <rect x="748" y="264" width="170" height="72" rx="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/>
+    <g filter="url(#liveGlow)"><rect x="865" y="210" width="210" height="78" rx="14" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/></g>
+    <text x="885" y="242" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#eef0f9">Iceberg Sink</text>
+    <text x="885" y="263" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#8b91a8">Kafka Connect, per table</text>
   </g>
   <g>
-    <path d="M773,282 L787,282 L780,296 Z" fill="none" stroke="#5eead4" stroke-width="1.6" stroke-linejoin="round"/>
-    <text x="800" y="300" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="14.5" font-weight="600" fill="#eef0f9">Iceberg Sink</text>
-    <text x="800" y="317" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="10.5" fill="#8b91a8">Kafka Connect, per-table</text>
-  </g>
-
-  <!-- MinIO (live) -->
-  <g filter="url(#liveGlow)">
-    <rect x="984" y="168" width="150" height="66" rx="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/>
+    <g filter="url(#liveGlow)"><rect x="1130" y="210" width="210" height="78" rx="14" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/></g>
+    <text x="1150" y="242" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#eef0f9">Trino</text>
+    <text x="1150" y="263" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#8b91a8">distributed SQL engine</text>
   </g>
   <g>
-    <path d="M1006,186 L1018,186 L1022,198 L1002,198 Z" fill="none" stroke="#5eead4" stroke-width="1.5"/>
-    <text x="1032" y="200" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="14" font-weight="600" fill="#eef0f9">MinIO</text>
-    <text x="1032" y="215" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="10" fill="#8b91a8">S3-compatible storage</text>
-  </g>
-
-  <!-- Nessie (live) -->
-  <g filter="url(#liveGlow)">
-    <rect x="984" y="400" width="150" height="66" rx="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/>
+    <g filter="url(#liveGlow)"><rect x="1395" y="210" width="210" height="78" rx="14" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/></g>
+    <text x="1415" y="242" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#eef0f9">Dagster</text>
+    <text x="1415" y="263" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#8b91a8">asset lineage &amp; scheduling</text>
   </g>
   <g>
-    <circle cx="1006" cy="428" r="2.4" fill="#5eead4"/>
-    <circle cx="1016" cy="420" r="2.4" fill="#5eead4"/>
-    <circle cx="1016" cy="436" r="2.4" fill="#5eead4"/>
-    <path d="M1006,428 L1016,420 M1006,428 L1016,436" stroke="#5eead4" stroke-width="1.2" fill="none"/>
-    <text x="1032" y="424" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="14" font-weight="600" fill="#eef0f9">Nessie</text>
-    <text x="1032" y="440" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="10" fill="#8b91a8">git-like Iceberg catalog</text>
-  </g>
-
-  <!-- Trino (live) -->
-  <g filter="url(#liveGlow)">
-    <rect x="1204" y="264" width="140" height="72" rx="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/>
+    <rect x="1660" y="210" width="210" height="78" rx="14" fill="#0d0f1a" stroke="#fbbf24" stroke-width="1.6" stroke-dasharray="3,4" opacity="0.92"/>
+    <text x="1680" y="242" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#e4d9b8">Prometheus</text>
+    <text x="1680" y="263" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#c9b285">metrics + pushgateway</text>
   </g>
   <g>
-    <circle cx="1228" cy="290" r="7" fill="none" stroke="#5eead4" stroke-width="1.6"/>
-    <line x1="1233" y1="295" x2="1238" y2="300" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round"/>
-    <text x="1252" y="300" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="14.5" font-weight="600" fill="#eef0f9">Trino</text>
-    <text x="1252" y="317" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="10.5" fill="#8b91a8">distributed SQL engine</text>
-  </g>
-
-  <!-- dbt (live) -->
-  <g filter="url(#liveGlow)">
-    <rect x="1318" y="180" width="170" height="70" rx="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/>
+    <g filter="url(#liveGlow)"><rect x="600" y="334" width="210" height="78" rx="14" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/></g>
+    <circle cx="618" cy="352" r="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.4"/>
+    <text x="618" y="356" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="#5eead4">1</text>
+    <text x="636" y="366" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#eef0f9">Apicurio Registry</text>
+    <text x="636" y="387" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#8b91a8">Avro schema contracts</text>
   </g>
   <g>
-    <rect x="1340" y="198" width="14" height="4" rx="1.5" fill="none" stroke="#5eead4" stroke-width="1.2"/>
-    <rect x="1340" y="206" width="14" height="4" rx="1.5" fill="none" stroke="#5eead4" stroke-width="1.2"/>
-    <rect x="1340" y="214" width="14" height="4" rx="1.5" fill="none" stroke="#5eead4" stroke-width="1.2"/>
-    <text x="1364" y="205" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="14" font-weight="600" fill="#eef0f9">dbt Core</text>
-    <text x="1364" y="220" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="9.5" fill="#8b91a8">Bronze&#8594;Silver&#8594;Gold, contracts &#8212; layer 2</text>
-  </g>
-  <circle cx="1338" cy="192" r="10" fill="#0c0e18" stroke="#5eead4" stroke-width="1.3"/>
-  <text x="1338" y="196" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10.5" font-weight="700" fill="#5eead4">2</text>
-
-  <!-- Great Expectations (live) -->
-  <g filter="url(#liveGlow)">
-    <rect x="1318" y="316" width="170" height="70" rx="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/>
+    <g filter="url(#liveGlow)"><rect x="865" y="334" width="210" height="78" rx="14" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/></g>
+    <text x="885" y="366" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#eef0f9">MinIO</text>
+    <text x="885" y="387" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#8b91a8">S3-compatible storage</text>
   </g>
   <g>
-    <path d="M1341,344 L1346,350 L1356,336" fill="none" stroke="#5eead4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="1364" y="345" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="13.5" font-weight="600" fill="#eef0f9">Great Expectations</text>
-    <text x="1364" y="360" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="9.5" fill="#8b91a8">row-level quality &#8212; layer 3</text>
-  </g>
-  <circle cx="1338" cy="330" r="10" fill="#0c0e18" stroke="#5eead4" stroke-width="1.3"/>
-  <text x="1338" y="334" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10.5" font-weight="700" fill="#5eead4">3</text>
-
-  <!-- Dagster (live) -->
-  <g filter="url(#liveGlow)">
-    <rect x="1318" y="485" width="170" height="64" rx="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/>
+    <g filter="url(#liveGlow)"><rect x="1130" y="334" width="210" height="78" rx="14" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/></g>
+    <circle cx="1148" cy="352" r="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.4"/>
+    <text x="1148" y="356" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="#5eead4">2</text>
+    <text x="1166" y="366" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#eef0f9">dbt Core</text>
+    <text x="1166" y="387" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#8b91a8">Bronze -&gt; Silver -&gt; Gold</text>
   </g>
   <g>
-    <circle cx="1340" cy="512" r="2.4" fill="#5eead4"/>
-    <circle cx="1350" cy="504" r="2.4" fill="#5eead4"/>
-    <circle cx="1350" cy="520" r="2.4" fill="#5eead4"/>
-    <path d="M1340,512 L1350,504 M1340,512 L1350,520" stroke="#5eead4" stroke-width="1.1" fill="none"/>
-    <text x="1364" y="514" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="14" font-weight="600" fill="#eef0f9">Dagster</text>
-    <text x="1364" y="529" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="9.5" fill="#8b91a8">asset lineage &amp; scheduling</text>
+    <rect x="1660" y="334" width="210" height="78" rx="14" fill="#0d0f1a" stroke="#fbbf24" stroke-width="1.6" stroke-dasharray="3,4" opacity="0.92"/>
+    <text x="1680" y="366" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#e4d9b8">Grafana</text>
+    <text x="1680" y="387" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#c9b285">dashboards</text>
+  </g>
+  <g>
+    <g filter="url(#liveGlow)"><rect x="865" y="458" width="210" height="78" rx="14" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/></g>
+    <text x="885" y="490" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#eef0f9">Nessie</text>
+    <text x="885" y="511" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#8b91a8">git-like Iceberg catalog</text>
+  </g>
+  <g>
+    <g filter="url(#liveGlow)"><rect x="1130" y="458" width="210" height="78" rx="14" fill="#0c0e18" stroke="#5eead4" stroke-width="1.8"/></g>
+    <circle cx="1148" cy="476" r="12" fill="#0c0e18" stroke="#5eead4" stroke-width="1.4"/>
+    <text x="1148" y="480" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="#5eead4">3</text>
+    <text x="1166" y="490" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="16" font-weight="700" fill="#eef0f9">Great Expectations</text>
+    <text x="1166" y="511" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="11.5" fill="#8b91a8">row-level data quality</text>
   </g>
 
-  <!-- Prometheus (built, first live run pending) -->
-  <rect x="1524" y="330" width="132" height="58" rx="12" fill="#0a0c14" stroke="#fbbf24" stroke-width="1.4" stroke-dasharray="2,4" opacity="0.9"/>
-  <path d="M1544,368 Q1540,356 1548,350 Q1546,358 1552,356 Q1550,364 1556,362 Q1554,370 1548,370 Z" fill="none" stroke="#fbbf24" stroke-width="1.3" opacity="0.95"/>
-  <text x="1568" y="364" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="12.5" fill="#c7ae7a">Prometheus</text>
+  <!-- Footer: contract layers -->
+  <line x1="70" y1="616" x2="1870" y2="616" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+  <g font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="13.5">
+    <circle cx="86" cy="650" r="11" fill="#0c0e18" stroke="#5eead4" stroke-width="1.4"/>
+    <text x="86" y="654" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" font-weight="700" fill="#5eead4">1</text>
+    <text x="110" y="655" fill="#c7cade" font-weight="600">Ingestion</text>
+    <text x="110" y="675" fill="#8b91a8" font-size="12">Apicurio rejects an incompatible schema before Kafka ever accepts it</text>
 
-  <!-- Grafana (built, first live run pending) -->
-  <rect x="1524" y="443" width="132" height="58" rx="12" fill="#0a0c14" stroke="#fbbf24" stroke-width="1.4" stroke-dasharray="2,4" opacity="0.9"/>
-  <g opacity="0.95">
-    <rect x="1542" y="472" width="5" height="12" fill="none" stroke="#fbbf24" stroke-width="1.1"/>
-    <rect x="1550" y="466" width="5" height="18" fill="none" stroke="#fbbf24" stroke-width="1.1"/>
-    <rect x="1558" y="476" width="5" height="8" fill="none" stroke="#fbbf24" stroke-width="1.1"/>
-    <text x="1572" y="479" font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="12.5" fill="#c7ae7a">Grafana</text>
+    <circle cx="880" cy="650" r="11" fill="#0c0e18" stroke="#5eead4" stroke-width="1.4"/>
+    <text x="880" y="654" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" font-weight="700" fill="#5eead4">2</text>
+    <text x="904" y="655" fill="#c7cade" font-weight="600">Transformation</text>
+    <text x="904" y="675" fill="#8b91a8" font-size="12">dbt Model Contracts fail the build on a column/type violation</text>
+
+    <circle cx="1380" cy="650" r="11" fill="#0c0e18" stroke="#5eead4" stroke-width="1.4"/>
+    <text x="1380" y="654" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11.5" font-weight="700" fill="#5eead4">3</text>
+    <text x="1404" y="655" fill="#c7cade" font-weight="600">Quality</text>
+    <text x="1404" y="675" fill="#8b91a8" font-size="12">Great Expectations fails the Dagster run on a row-level rule violation</text>
   </g>
 
-  <!-- ===== Footer: contract layers ===== -->
-  <line x1="56" y1="590" x2="1644" y2="590" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
-  <g font-family="'Space Grotesk','Segoe UI',sans-serif" font-size="12.5">
-    <circle cx="72" cy="622" r="10" fill="#141731" stroke="#818cf8" stroke-width="1.3"/>
-    <text x="72" y="626" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10.5" font-weight="700" fill="#a9adc4">1</text>
-    <text x="94" y="626" fill="#c7cade">Ingestion</text>
-    <text x="94" y="644" fill="#75798c" font-size="11.5">Apicurio rejects an incompatible schema before Kafka ever accepts it</text>
-
-    <circle cx="590" cy="622" r="10" fill="#141731" stroke="#818cf8" stroke-width="1.3"/>
-    <text x="590" y="626" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10.5" font-weight="700" fill="#a9adc4">2</text>
-    <text x="612" y="626" fill="#c7cade">Transformation</text>
-    <text x="612" y="644" fill="#75798c" font-size="11.5">dbt Model Contracts fail the build on a column/type violation</text>
-
-    <circle cx="1108" cy="622" r="10" fill="#141731" stroke="#818cf8" stroke-width="1.3"/>
-    <text x="1108" y="626" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10.5" font-weight="700" fill="#a9adc4">3</text>
-    <text x="1130" y="626" fill="#c7cade">Quality</text>
-    <text x="1130" y="644" fill="#75798c" font-size="11.5">Great Expectations fails the Dagster run on a row-level rule violation</text>
-  </g>
-
-  <text x="56" y="716" font-family="'JetBrains Mono',monospace" font-size="11" fill="#454a5e">Tier 1 built, mostly verified end-to-end &#183; 24 ADRs documenting every non-obvious fix &#183; github.com/NandakumarVuppalapati/cdc-lakehouse-data-contracts</text>
+  <text x="70" y="776" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="#454a5e">Tier 1 built, mostly verified end-to-end &#183; CI proven live on GitHub Actions &#183; 24 ADRs documenting every non-obvious fix &#183; github.com/NandakumarVuppalapati/cdc-lakehouse-data-contracts</text>
 </svg>
