@@ -20,6 +20,7 @@ volumes:
   dagster_home:
   prometheus_data:
   grafana_data:
+  marquez_db_data:
 
 services:
   # ---------------------------------------------------------------------------
@@ -346,6 +347,18 @@ services:
     depends_on:
       trino-init:
         condition: service_completed_successfully
+      # Not required for `dbt --version` (the default command below), but
+      # a real `dbt run`/`build` now emits OpenLineage events to marquez-api
+      # as it goes (see ADR 0025) — depending on marquez-api being healthy
+      # avoids every event silently failing against a backend that isn't up
+      # yet, same ordering discipline as trino-init/apicurio elsewhere.
+      marquez-api:
+        condition: service_healthy
+    environment:
+      # Consumed by openlineage-dbt's `dbt-ol` wrapper (run_with_metrics.py
+      # invokes `dbt-ol`, not the raw `dbt` binary — see ADR 0025).
+      OPENLINEAGE_URL: http://marquez-api:5000
+      OPENLINEAGE_NAMESPACE: cdc_lakehouse
     volumes:
       - ./dbt/cdc_lakehouse:/dbt/cdc_lakehouse
       - ./dbt/profiles.yml:/root/.dbt/profiles.yml
@@ -450,11 +463,20 @@ services:
   # Prometheus could ever scrape them directly, so they push here instead,
   # and Prometheus scrapes Pushgateway itself — the pattern Prometheus's own
   # docs recommend for batch/ephemeral jobs, not a workaround.
+  #
+  # Host port 9096, not Pushgateway's default 9091 — that port was already
+  # claimed by Apicurio's admin interface (see the apicurio service below),
+  # a real collision caught by re-reading this file rather than assuming
+  # each service's port block was independently correct. Nothing inside the
+  # stack depends on the host mapping (Prometheus scrapes pushgateway:9091
+  # over the internal network), so this is a same-shape fix to the "host
+  # port remapped, container port untouched" pattern already used for kafka
+  # and trino above.
   pushgateway:
     image: prom/pushgateway:v1.11.3
     container_name: lakehouse-pushgateway
     ports:
-      - "9091:9091"
+      - "9096:9091"
     networks:
       - lakehouse-net
 
@@ -507,5 +529,86 @@ services:
       - grafana_data:/var/lib/grafana
     ports:
       - "3001:3000"
+    networks:
+      - lakehouse-net
+
+  # ---------------------------------------------------------------------------
+  # Marquez: OpenLineage backend (API + Postgres store) and its web UI —
+  # Tier 2 column-level lineage. Own dedicated Postgres (marquez-db), not the
+  # shared lakehouse `postgres` service — mirrors Marquez's own reference
+  # docker-compose.yml (confirmed against github.com/MarquezProject/marquez
+  # before writing this, not guessed — see ADR 0025), and keeps its schema
+  # independent the same way apicurio_registry/nessie already got their own
+  # databases on the shared instance rather than reusing `sourcedb`.
+  # Version 0.51.1 pinned — the newest tag Docker Hub lists as pushed (not
+  # just "latest", which points at the same digest); marquez-web ships the
+  # same version lockstep.
+  # ---------------------------------------------------------------------------
+  marquez-db:
+    image: postgres:14
+    container_name: lakehouse-marquez-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      MARQUEZ_DB: marquez
+      MARQUEZ_USER: marquez
+      MARQUEZ_PASSWORD: marquez
+    # Host port 5433, not 5432 — 5432 is already the shared lakehouse
+    # `postgres` service's host mapping. Nothing inside the stack depends on
+    # this host port; marquez-api reaches this container at marquez-db:5432
+    # over the internal network.
+    ports:
+      - "5433:5432"
+    volumes:
+      - marquez_db_data:/var/lib/postgresql/data
+    networks:
+      - lakehouse-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  marquez-api:
+    image: marquezproject/marquez:0.51.1
+    container_name: lakehouse-marquez-api
+    depends_on:
+      marquez-db:
+        condition: service_healthy
+    environment:
+      MARQUEZ_PORT: "5000"
+      MARQUEZ_ADMIN_PORT: "5001"
+      POSTGRES_HOST: marquez-db
+      POSTGRES_PORT: "5432"
+      SEARCH_ENABLED: "false"
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    networks:
+      - lakehouse-net
+    healthcheck:
+      # Dropwizard admin interface exposes /healthcheck on the admin port —
+      # confirmed against Marquez's own README before writing this (same
+      # "verify the live endpoint, don't guess the framework's convention"
+      # discipline as ADR 0013/0016).
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5001/healthcheck || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+
+  marquez-web:
+    image: marquezproject/marquez-web:0.51.1
+    container_name: lakehouse-marquez-web
+    depends_on:
+      marquez-api:
+        condition: service_healthy
+    environment:
+      MARQUEZ_HOST: marquez-api
+      MARQUEZ_PORT: "5000"
+      WEB_PORT: "3000"
+      REACT_APP_ADVANCED_SEARCH: "false"
+    # Host port 3002 — 3000 is Dagster's, 3001 is Grafana's.
+    ports:
+      - "3002:3000"
     networks:
       - lakehouse-net

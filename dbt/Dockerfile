@@ -1,9 +1,15 @@
 # dbt Core + the Trino adapter. Pinned versions confirmed compatible against
 # dbt docs before writing this (dbt-trino 1.10.x <-> dbt-core 1.11.x) rather
 # than guessed — see ADR 0015.
+#
+# openlineage-dbt provides the `dbt-ol` wrapper script: a drop-in
+# replacement for `dbt` that emits OpenLineage column-lineage events to
+# Marquez after each run (see ADR 0025). `trino` is one of its explicitly
+# supported adapters (confirmed against the package's own README before
+# pinning this, not assumed).
 FROM python:3.11-slim
 
-RUN pip install --no-cache-dir dbt-trino==1.10.2
+RUN pip install --no-cache-dir dbt-trino==1.10.2 openlineage-dbt==1.52.0
 
 WORKDIR /dbt
 
